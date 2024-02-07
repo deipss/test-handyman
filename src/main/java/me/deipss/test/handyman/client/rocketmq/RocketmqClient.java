@@ -1,8 +1,10 @@
 package me.deipss.test.handyman.client.rocketmq;
 
 
-import me.deipss.test.handyman.client.BaseClient;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import me.deipss.test.handyman.client.AbstractClient;
+import me.deipss.test.handyman.client.ClientResponse;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
@@ -10,25 +12,25 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class RocketmqClient implements BaseClient<RocketmqRequest> {
+public class RocketmqClient extends AbstractClient<RocketmqRequest, DefaultMQProducer, SendResult> {
 
     @Override
-    public Object execute(RocketmqRequest request) {
-        DefaultMQProducer producer = new DefaultMQProducer(request.getGroup());
-        producer.setNamesrvAddr(request.getNamespace());
-        try {
-            producer.start();
+    @SneakyThrows
+    public ClientResponse<SendResult> execute(RocketmqRequest request) {
             Message message = new Message();
             message.setBody(request.getMsg().getBytes());
             message.setTopic(request.getTopic());
             message.setTags(request.getTags());
-            SendResult send = producer.send(message);
-            return send;
-        }catch (Exception e){
-            log.error("rocket mq error",e);
-        }finally {
-            producer.shutdown();
-        }
-        return null;
+            SendResult send = clientMap.get(DEFAULT_KEY).send(message);
+            return ClientResponse.<SendResult>builder().data(send).build();
+    }
+
+    @Override
+    @SneakyThrows
+    public void initClient() {
+        DefaultMQProducer producer = new DefaultMQProducer("");
+        producer.setNamesrvAddr("");
+        producer.start();
+        clientMap.put(DEFAULT_KEY,producer);
     }
 }

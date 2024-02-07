@@ -12,10 +12,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +26,7 @@ import java.util.Map;
 @Slf4j
 public class LocalHttpClient<T> {
 
-    @Autowired
+    @Resource
     @Qualifier(HttpClientConfiguration.CLOSEABLE_HTTP_CLIENT)
     private HttpClient httpClient;
 

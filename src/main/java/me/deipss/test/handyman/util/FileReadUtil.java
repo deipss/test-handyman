@@ -14,13 +14,11 @@ public class FileReadUtil {
     /**
      * 使用类的加载器路径来获取文件内容
      */
-
     public static String getResourceFile(String path) {
         String configString = "";
-        try {
-            URL url = FileReadUtil.class.getClassLoader().getResource(path);
-            assert url != null;
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openStream()));
+        URL url = FileReadUtil.class.getClassLoader().getResource(path);
+        assert url != null;
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openStream()))) {
             StringBuilder result = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -38,10 +36,8 @@ public class FileReadUtil {
      */
     public static String readResourceFile(String path) {
         String configString = "";
-        try {
-
-            InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(resourceAsStream));
+        try (InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(resourceAsStream))) {
             StringBuilder result = new StringBuilder();
             String line;
             while ((line = bufferedReader.readLine()) != null) {

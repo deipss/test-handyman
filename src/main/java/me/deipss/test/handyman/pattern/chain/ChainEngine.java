@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 @Component
 public class ChainEngine<T> {
 
-    @Autowired
+    @Resource
     List<ChainNode<T>> nodeList;
     /**
      * 节点映射

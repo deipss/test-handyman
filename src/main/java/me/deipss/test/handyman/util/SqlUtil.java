@@ -1,6 +1,6 @@
 package me.deipss.test.handyman.util;
 
-import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,15 +28,5 @@ public class SqlUtil {
         join = StringUtils.join(placeholders, ",");
         sql = sql.replace("#values#",join);
         return new MutablePair<>(sql,values);
-    }
-
-    public static void main(String[] args) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("orderID","XS2222323232");
-        jsonObject.put("userName","Test_001");
-
-        Pair<String, List<Object>> tUserOrder = insert("t_user_order", jsonObject);
-        System.out.println(tUserOrder.getKey());
-        // insert into t_user_order  (`orderID`,`userName`) values (?,?)
     }
 }

@@ -1,7 +1,17 @@
 package me.deipss.test.handyman.client;
 
 
-public interface BaseClient<T extends ClientRequest> {
+public interface BaseClient<R extends ClientRequest,T,K> {
 
-    Object execute(T request);
+    String DEFAULT_KEY = "default";
+
+
+
+    ClientResponse<K> execute(R request);
+
+
+    void initClient();
+
+
+
 }

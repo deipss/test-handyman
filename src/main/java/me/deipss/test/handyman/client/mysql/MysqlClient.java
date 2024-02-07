@@ -1,8 +1,9 @@
 package me.deipss.test.handyman.client.mysql;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
-import me.deipss.test.handyman.client.BaseClient;
 import lombok.extern.slf4j.Slf4j;
+import me.deipss.test.handyman.client.AbstractClient;
+import me.deipss.test.handyman.client.ClientResponse;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -11,22 +12,14 @@ import java.util.*;
 
 @Component
 @Slf4j
-public class MysqlClient implements BaseClient<MysqlRequest> {
-
-    @Override
-    public Object execute(MysqlRequest request) {
-        if(request.getSql().toLowerCase().trim().startsWith("select")){
-            return executeQuery(request);
-        }
-        return executeUpdate(request);
-    }
+public class MysqlClient extends AbstractClient<MysqlRequest, DataSource, Object> {
 
 
     public List<Map<String, Object>> executeQuery(MysqlRequest request) {
         Statement statement = null;
         Connection connection = null;
         try {
-            DataSource dataSource = buildDataSource(request);
+            DataSource dataSource = clientMap.get(DEFAULT_KEY);
             connection = dataSource.getConnection();
             statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(request.getSql());
@@ -65,7 +58,7 @@ public class MysqlClient implements BaseClient<MysqlRequest> {
         Statement statement = null;
         Connection connection = null;
         try {
-            DataSource dataSource = buildDataSource(request);
+            DataSource dataSource = clientMap.get(DEFAULT_KEY);
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
             statement = connection.createStatement();
@@ -89,13 +82,18 @@ public class MysqlClient implements BaseClient<MysqlRequest> {
     }
 
 
-    private DataSource buildDataSource(MysqlRequest property) {
-        MysqlDataSource mysqlDataSource = new MysqlDataSource();
-        mysqlDataSource.setPassword(property.getPassword());
-        mysqlDataSource.setUser(property.getUsername());
-        mysqlDataSource.setUrl(property.getUrl());
-        return mysqlDataSource;
+    @Override
+    public ClientResponse<Object> execute(MysqlRequest request) {
+        return null;
     }
 
-
+    @Override
+    public void initClient() {
+        clientMap = new HashMap<>();
+        MysqlDataSource mysqlDataSource = new MysqlDataSource();
+        mysqlDataSource.setPassword("");
+        mysqlDataSource.setUser("");
+        mysqlDataSource.setUrl("");
+        clientMap.put(DEFAULT_KEY, mysqlDataSource);
+    }
 }

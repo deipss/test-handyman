@@ -1,7 +1,9 @@
 package me.deipss.test.handyman.client.redis;
 
-import me.deipss.test.handyman.client.BaseClient;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import me.deipss.test.handyman.client.AbstractClient;
+import me.deipss.test.handyman.client.ClientResponse;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -13,31 +15,32 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class RedisClient implements BaseClient<RedisRequest> {
+public class RedisClient extends AbstractClient<RedisRequest, JedisConnectionFactory, Object> {
 
 
     @Override
-    public Object execute(RedisRequest request) {
+    public ClientResponse<Object> execute(RedisRequest request) {
         JedisConnectionFactory jedisConnectionFactory = null;
         try {
-            jedisConnectionFactory = jedisConnectionFactory(request);
+            jedisConnectionFactory = clientMap.get(DEFAULT_KEY)
             Pair<String, byte[][]> commandPair = buildCommand(request.getCommand());
             Object execute = jedisConnectionFactory.getConnection().execute(commandPair.getKey(), commandPair.getValue());
             assert execute != null;
             if (execute.getClass().isPrimitive()) {
-                return new String((byte[]) execute);
+                return ClientResponse.<Object>builder().data(new String((byte[]) execute)).build();
+
             }
             if (execute.getClass().getName().endsWith("List")) {
                 ArrayList<String> objects = new ArrayList<>(((Collection<?>) execute).size());
                 ((Collection<?>) execute).forEach(o -> {
                     objects.add(new String((byte[]) o));
                 });
-                return objects;
+                return ClientResponse.<Object>builder().data(objects).build();
             }
             if (execute.getClass().getName().endsWith("Map")) {
                 Map<String, String> map = new HashMap<>(((Map<?, ?>) execute).size());
                 ((Map<?, ?>) execute).forEach((key, value) -> map.put(new String((byte[]) key), new String((byte[]) value)));
-                return map;
+                return ClientResponse.<Object>builder().data(execute).build();
             }
         } catch (Exception e) {
             log.error("redis operate error", e);
@@ -49,15 +52,21 @@ public class RedisClient implements BaseClient<RedisRequest> {
         return null;
     }
 
-    private JedisConnectionFactory jedisConnectionFactory(RedisRequest request) {
+    @Override
+    public void initClient() {
+        clientMap = new HashMap<>();
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setDatabase(request.getDatabase());
-        redisStandaloneConfiguration.setHostName(request.getHost());
-        redisStandaloneConfiguration.setPassword(request.getPassword());
-        redisStandaloneConfiguration.setPort(request.getPort());
+        redisStandaloneConfiguration.setDatabase(1);
+        redisStandaloneConfiguration.setHostName("");
+        redisStandaloneConfiguration.setPassword("");
+        redisStandaloneConfiguration.setPort(6397);
         JedisConnectionFactory jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
         jedisConFactory.afterPropertiesSet();
-        return jedisConFactory;
+        clientMap.put(DEFAULT_KEY, jedisConFactory);
+    }
+
+    private JedisConnectionFactory jedisConnectionFactory(RedisRequest request) {
+
     }
 
     private Pair<String, byte[][]> buildCommand(String command) {

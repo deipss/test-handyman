@@ -8,8 +8,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientRequest {
+
     private String username;
+
     private String password;
+
     private String IP;
+
     private int port;
+
+    private String clientKey;
 }
