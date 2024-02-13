@@ -5,6 +5,8 @@ import me.deipss.test.handyman.client.AbstractClient;
 import me.deipss.test.handyman.client.ClientResponse;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.stereotype.Component;
@@ -56,12 +58,14 @@ public class RedisClient extends AbstractClient<RedisRequest, JedisConnectionFac
         if (Objects.isNull(clientMap)) {
             clientMap = new HashMap<>();
         }
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setDatabase(0);
-        redisStandaloneConfiguration.setHostName("192.168.0.2");
-        redisStandaloneConfiguration.setPassword("jhkdjhkjdhsIUTYURTU_T2RPWr");
-        redisStandaloneConfiguration.setPort(6397);
-        JedisConnectionFactory jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
+
+        JedisConnectionFactory jedisConFactory
+                = new JedisConnectionFactory();
+        jedisConFactory.setHostName("192.168.0.2");
+        jedisConFactory.setPassword("jhkdjhkjdhsIUTYURTU_T2RPWr");
+        jedisConFactory.setDatabase(0);
+        jedisConFactory.setPort(6379);
+
         jedisConFactory.afterPropertiesSet();
         clientMap.put(DEFAULT_KEY, jedisConFactory);
     }
@@ -77,5 +81,4 @@ public class RedisClient extends AbstractClient<RedisRequest, JedisConnectionFac
         byte[][] bytes = collect.stream().map(String::getBytes).collect(Collectors.toList()).toArray(new byte[0][0]);
         return Pair.of(preCommand, bytes);
     }
-
 }
