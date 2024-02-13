@@ -5,8 +5,6 @@ public interface BaseClient<R extends ClientRequest,T,K> {
 
     String DEFAULT_KEY = "default";
 
-
-
     ClientResponse<K> execute(R request);
 
 

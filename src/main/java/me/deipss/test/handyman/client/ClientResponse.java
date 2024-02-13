@@ -13,4 +13,18 @@ public class ClientResponse<T> {
     private T data;
     private int code;
     private String msg;
+
+    public boolean successHttp(){
+        return code==200;
+    }
+
+    public boolean success(){
+        return code==1;
+    }
+
+    public boolean fail(){
+        return code==-1;
+    }
+
+
 }

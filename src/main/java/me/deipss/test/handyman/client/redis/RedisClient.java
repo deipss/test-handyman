@@ -1,6 +1,5 @@
 package me.deipss.test.handyman.client.redis;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import me.deipss.test.handyman.client.AbstractClient;
 import me.deipss.test.handyman.client.ClientResponse;
@@ -22,7 +21,7 @@ public class RedisClient extends AbstractClient<RedisRequest, JedisConnectionFac
     public ClientResponse<Object> execute(RedisRequest request) {
         JedisConnectionFactory jedisConnectionFactory = null;
         try {
-            jedisConnectionFactory = clientMap.get(DEFAULT_KEY)
+            jedisConnectionFactory = clientMap.get(DEFAULT_KEY);
             Pair<String, byte[][]> commandPair = buildCommand(request.getCommand());
             Object execute = jedisConnectionFactory.getConnection().execute(commandPair.getKey(), commandPair.getValue());
             assert execute != null;
@@ -54,11 +53,13 @@ public class RedisClient extends AbstractClient<RedisRequest, JedisConnectionFac
 
     @Override
     public void initClient() {
-        clientMap = new HashMap<>();
+        if (Objects.isNull(clientMap)) {
+            clientMap = new HashMap<>();
+        }
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setDatabase(1);
-        redisStandaloneConfiguration.setHostName("");
-        redisStandaloneConfiguration.setPassword("");
+        redisStandaloneConfiguration.setDatabase(0);
+        redisStandaloneConfiguration.setHostName("192.168.0.2");
+        redisStandaloneConfiguration.setPassword("jhkdjhkjdhsIUTYURTU_T2RPWr");
         redisStandaloneConfiguration.setPort(6397);
         JedisConnectionFactory jedisConFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
         jedisConFactory.afterPropertiesSet();
@@ -66,7 +67,7 @@ public class RedisClient extends AbstractClient<RedisRequest, JedisConnectionFac
     }
 
     private JedisConnectionFactory jedisConnectionFactory(RedisRequest request) {
-
+        return null;
     }
 
     private Pair<String, byte[][]> buildCommand(String command) {
