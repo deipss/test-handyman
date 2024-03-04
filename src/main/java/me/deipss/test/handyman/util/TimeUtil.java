@@ -26,6 +26,12 @@ public class TimeUtil {
         return localDateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
     }
 
+    public static long epochMilliNow() {
+        return LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+    }
+
+
+
     public static LocalDate parseLocalDate(String pattern, String format) {
         return toLocalDateTime(parseDate(pattern, format)).toLocalDate();
     }

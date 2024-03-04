@@ -29,7 +29,6 @@ public class ValidUtil<T> {
         if (validate.size() > 0) {
             List<String> collect = validate.stream().map(ConstraintViolation::getMessage).collect(Collectors.toList());
             return StringUtils.join(collect, ',');
-
         }
         return null;
     }

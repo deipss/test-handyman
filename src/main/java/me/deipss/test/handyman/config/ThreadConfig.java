@@ -34,7 +34,7 @@ public class ThreadConfig {
 
     @Bean(SCHEDULING_THREAD_POOL_EXECUTOR)
     public ThreadPoolExecutor scheduling() {
-        log.info("开始线程池配置");
+        log.info("开始SCHEDULING_THREAD_POOL_EXECUTOR线程池配置");
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("task-scheduling-thread" + "-%d")
                 .setDaemon(false).build();
@@ -49,8 +49,8 @@ public class ThreadConfig {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!executor.isShutdown()) {
-                List<Runnable> runnables = executor.shutdownNow();
-                log.warn("task-scheduling-thread losing {}", runnables.size());
+                List<Runnable> runnableList = executor.shutdownNow();
+                log.warn("task-scheduling-thread losing {}", runnableList.size());
             }
             log.info("task-scheduling-thread close");
         }));
@@ -74,8 +74,8 @@ public class ThreadConfig {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!executor.isShutdown()) {
-                List<Runnable> runnables = executor.shutdownNow();
-                log.warn("task-execute-thread losing {}", runnables.size());
+                List<Runnable> runnableList = executor.shutdownNow();
+                log.warn("task-execute-thread losing {}", runnableList.size());
             }
             log.info("task-execute-thread close");
         }));
