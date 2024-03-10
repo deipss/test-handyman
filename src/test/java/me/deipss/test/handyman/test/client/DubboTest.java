@@ -11,6 +11,7 @@ public class DubboTest {
     @Test
     public void test(){
         DubboClient dubboClient = new DubboClient();
+        dubboClient.init();
         DubboRequest dubboRequest = new DubboRequest();
         dubboRequest.setInterfaceName("me.deipss.jvm.sandbox.inspector.debug.api.facade.PaymentFacade");
         dubboRequest.setMethod("payment");

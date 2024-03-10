@@ -64,9 +64,10 @@ public class DubboClient extends AbstractClient<DubboRequest, GenericService, Ob
         }
         ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
         reference.setInterface(request.getInterfaceName());
-        reference.setVersion("1.0.0");
         reference.setApplication(applicationConfig);
         reference.setGeneric(true);
+        reference.setSticky(false);
+        reference.setTimeout(10000);
         clientMap.put(DEFAULT_KEY, reference.get());
     }
 
