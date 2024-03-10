@@ -10,10 +10,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -34,7 +38,7 @@ public class LocalHttpClient<T> {
     public HttpResult post(String url, T body, List<Header> headers) {
         HttpPost post = new HttpPost(url);
         HttpResult result = new HttpResult();
-        if (null != headers && headers.size() > 0) {
+        if (null != headers && !headers.isEmpty()) {
             headers.forEach(post::addHeader);
         }
         post.addHeader("Content-Type", "application/json");
@@ -43,10 +47,10 @@ public class LocalHttpClient<T> {
             post.setEntity(httpEntity);
             HttpResponse response = httpClient.execute(post);
             int code = response.getStatusLine().getStatusCode();
-            if (code == HttpStatus.SC_OK) {
+            if (code >= HttpStatus.SC_OK && code < HttpStatus.SC_BAD_REQUEST) {
                 result.setSuccess(true);
                 result.setHttpStatus(code);
-                result.setData(EntityUtils.toString(response.getEntity(),StandardCharsets.UTF_8));
+                result.setData(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
                 return result;
             }
         } catch (IOException e) {
@@ -56,7 +60,41 @@ public class LocalHttpClient<T> {
         return result;
     }
 
-    public  HttpResult get(String url, Map<String, String> params, List<Header> headers) {
+
+    public HttpResult upload(String url, List<Header> headers, List<MultipartFile> files, Map<String, String> paramMap) {
+        HttpPost post = new HttpPost(url);
+        HttpResult result = new HttpResult();
+        if (null != headers && !headers.isEmpty()) {
+            headers.forEach(post::addHeader);
+        }
+
+        try {
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.setCharset(StandardCharsets.UTF_8);
+            builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);//加上此行代码解决返回中文乱码问题
+            for (MultipartFile file : files) {
+                builder.addBinaryBody(file.getName(), file.getInputStream(), ContentType.MULTIPART_FORM_DATA, file.getName());// 文件流
+            }
+            for (Map.Entry<String, String> entry : paramMap.entrySet()) {
+                builder.addTextBody(entry.getKey(), entry.getValue());
+            }
+            post.setEntity(builder.build());
+            HttpResponse response = httpClient.execute(post);
+            int code = response.getStatusLine().getStatusCode();
+            if (code >= HttpStatus.SC_OK && code < HttpStatus.SC_BAD_REQUEST) {
+                result.setSuccess(true);
+                result.setHttpStatus(code);
+                result.setData(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
+                return result;
+            }
+        } catch (IOException e) {
+            log.error("http post异常，url={}", url, e);
+        }
+        result.setSuccess(false);
+        return result;
+    }
+
+    public HttpResult get(String url, Map<String, String> params, List<Header> headers) {
 
         HttpGet httpGet = new HttpGet(url);
         HttpResult result = new HttpResult();

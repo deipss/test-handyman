@@ -17,5 +17,5 @@ public class ClientRequest {
 
     private int port;
 
-    private String clientKey;
+    private String clientKey="default";
 }

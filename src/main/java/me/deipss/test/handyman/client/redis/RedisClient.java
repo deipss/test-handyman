@@ -5,10 +5,9 @@ import me.deipss.test.handyman.client.AbstractClient;
 import me.deipss.test.handyman.client.ClientResponse;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -18,12 +17,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RedisClient extends AbstractClient<RedisRequest, JedisConnectionFactory, Object> {
 
-
+    protected Map<String, RedisTemplate<String,String>> redisTemplateMap= new HashMap<>();
     @Override
     public ClientResponse<Object> execute(RedisRequest request) {
         JedisConnectionFactory jedisConnectionFactory = null;
         try {
-            jedisConnectionFactory = clientMap.get(DEFAULT_KEY);
+            jedisConnectionFactory = clientMap.get(request.getClientKey());
             Pair<String, byte[][]> commandPair = buildCommand(request.getCommand());
             Object execute = jedisConnectionFactory.getConnection().execute(commandPair.getKey(), commandPair.getValue());
             assert execute != null;
@@ -52,6 +51,10 @@ public class RedisClient extends AbstractClient<RedisRequest, JedisConnectionFac
         }
         return null;
     }
+    public String get(RedisRequest request){
+        RedisTemplate<String, String> stringStringRedisTemplate = redisTemplateMap.get(request.getKey());
+        return stringStringRedisTemplate.opsForValue().get(request.getKey());
+    }
 
     @Override
     public void initClient() {
@@ -68,7 +71,15 @@ public class RedisClient extends AbstractClient<RedisRequest, JedisConnectionFac
 
         jedisConFactory.afterPropertiesSet();
         clientMap.put(DEFAULT_KEY, jedisConFactory);
+
+
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConFactory);
+        template.setKeySerializer(StringRedisSerializer.UTF_8);
+        template.setValueSerializer(StringRedisSerializer.UTF_8);
+        redisTemplateMap.put(DEFAULT_KEY,template);
     }
+
 
     private JedisConnectionFactory jedisConnectionFactory(RedisRequest request) {
         return null;

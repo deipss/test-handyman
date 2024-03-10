@@ -13,9 +13,6 @@ public class HttpResult {
 
     private boolean success;
 
-
-
-
     private String data;
 
 }

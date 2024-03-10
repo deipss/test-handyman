@@ -26,5 +26,7 @@ public class ClientResponse<T> {
         return code==-1;
     }
 
+    
+
 
 }

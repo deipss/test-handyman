@@ -19,7 +19,7 @@ public class MysqlClient extends AbstractClient<MysqlRequest, DataSource, Object
         Statement statement = null;
         Connection connection = null;
         try {
-            DataSource dataSource = clientMap.get(DEFAULT_KEY);
+            DataSource dataSource = clientMap.get(request.getClientKey());
             connection = dataSource.getConnection();
             statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(request.getSql());

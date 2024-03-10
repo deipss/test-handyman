@@ -19,18 +19,20 @@ public class JdbcClient extends AbstractClient<JdbcRequest, JdbcTemplate, Object
 
     @Override
     public ClientResponse<Object> execute(JdbcRequest request) {
-        return null;
+        JdbcTemplate jdbcTemplate = clientMap.get(request.getClientKey());
+        jdbcTemplate.execute(request.getSql());
+        return ClientResponse.builder().msg(request.getSql()).build();
     }
 
     public ClientResponse<Integer> update(JdbcRequest request) {
-        JdbcTemplate jdbcTemplate = clientMap.get(DEFAULT_KEY);
+        JdbcTemplate jdbcTemplate = clientMap.get(request.getClientKey());
         Pair<String, List<Object>> insert = SqlUtil.insert(request.getSql(), request.getJsonObject());
         int update = jdbcTemplate.update(insert.getKey(), insert.getValue());
         return ClientResponse.<Integer>builder().data(update).build();
     }
 
     public ClientResponse<List<Map<String, Object>>> query(JdbcRequest request) {
-        JdbcTemplate jdbcTemplate = clientMap.get(DEFAULT_KEY);
+        JdbcTemplate jdbcTemplate = clientMap.get(request.getClientKey());
         List<Map<String, Object>> maps = jdbcTemplate.queryForList(request.getSql());
         return ClientResponse.<List<Map<String, Object>>>builder().data(maps).build();
     }

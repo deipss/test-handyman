@@ -23,7 +23,7 @@ public class DubboClient extends AbstractClient<DubboRequest, GenericService, Ob
     @Override
     @SneakyThrows
     public ClientResponse<Object> execute(DubboRequest request) {
-        GenericService genericService = clientMap.get(DEFAULT_KEY);
+        GenericService genericService = clientMap.get(request.getClientKey());
         Object result = genericService.$invoke(request.getMethod(), request.getParamNameList(), request.getParamObjList());
         return ClientResponse.builder().data(result).build();
     }
