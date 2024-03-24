@@ -36,7 +36,7 @@ public class FileReadUtil {
      */
     public static String readResourceFile(String path) {
         String configString = "";
-        try (InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+        try (InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("classpath*:"+path);
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(resourceAsStream))) {
             StringBuilder result = new StringBuilder();
             String line;

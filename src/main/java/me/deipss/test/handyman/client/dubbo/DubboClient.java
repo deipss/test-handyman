@@ -1,5 +1,6 @@
 package me.deipss.test.handyman.client.dubbo;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.deipss.test.handyman.client.AbstractClient;
@@ -11,7 +12,7 @@ import org.apache.dubbo.rpc.service.GenericService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -32,9 +33,6 @@ public class DubboClient extends AbstractClient<DubboRequest, GenericService, Ob
     @Override
     @SneakyThrows
     public void initClient() {
-        if (null == clientMap) {
-            clientMap = new HashMap<>();
-        }
         ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
         reference.setInterface("com.xxx.XxxService");
         reference.setVersion("1.0.0");
@@ -46,22 +44,20 @@ public class DubboClient extends AbstractClient<DubboRequest, GenericService, Ob
     public void init() {
         RegistryConfig registryConfig = buildRegistryConfig();
         applicationConfig = new ApplicationConfig();
-        applicationConfig.setName("dubbo-admin");
+        applicationConfig.setName("test-handyman");
         applicationConfig.setRegistry(registryConfig);
     }
 
 
     private RegistryConfig buildRegistryConfig() {
         RegistryConfig config = new RegistryConfig();
-        config.setAddress("zookeeper://192.168.0.2:2181");
+        List<JSONObject> dubbo = getClientConfig("dubbo");
+        config.setAddress(dubbo.get(0).get("url").toString());
         return config;
     }
 
     @SneakyThrows
     public void initClient(DubboRequest request) {
-        if (null == clientMap) {
-            clientMap = new HashMap<>();
-        }
         ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
         reference.setInterface(request.getInterfaceName());
         reference.setApplication(applicationConfig);
@@ -70,6 +66,4 @@ public class DubboClient extends AbstractClient<DubboRequest, GenericService, Ob
         reference.setTimeout(10000);
         clientMap.put(DEFAULT_KEY, reference.get());
     }
-
-
 }

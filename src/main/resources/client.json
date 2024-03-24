@@ -1,0 +1,31 @@
+[
+  {
+    "clientName": "dubbo",
+    "clientKey": "default",
+    "env": "dev",
+    "url": "zookeeper://192.168.0.2:2181"
+  },
+  {
+    "clientName": "jdbc",
+    "clientKey": "default",
+    "env": "dev",
+    "url": "jdbc:mysql://192.168.0.2:3306/inspector",
+    "username": "root",
+    "password": "mysql_Xh7Z62"
+  },
+  {
+    "clientName": "redis",
+    "clientKey": "default",
+    "env": "dev",
+    "ip": "192.168.0.2",
+    "port": 6379,
+    "database": 0,
+    "password": "jhkdjhkjdhsIUTYURTU_T2RPWr"
+  },
+  {
+    "clientName": "rocketmq",
+    "clientKey": "default",
+    "env": "dev",
+    "url": "192.168.0.2:9876"
+  }
+]

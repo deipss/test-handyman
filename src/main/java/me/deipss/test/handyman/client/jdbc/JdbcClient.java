@@ -1,5 +1,6 @@
 package me.deipss.test.handyman.client.jdbc;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import me.deipss.test.handyman.client.AbstractClient;
 import me.deipss.test.handyman.client.ClientResponse;
@@ -9,7 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
 
@@ -38,15 +39,15 @@ public class JdbcClient extends AbstractClient<JdbcRequest, JdbcTemplate, Object
     }
 
     @Override
+    @PostConstruct
     public void initClient() {
-        if (clientMap==null) {
-            clientMap  = new HashMap<>(1);
-        }
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        List<JSONObject> jdbcList = getClientConfig("jdbc");
+        JSONObject jsonObject = jdbcList.get(0);
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://192.168.0.2:3306/inspector");
-        dataSource.setUsername("root");
-        dataSource.setPassword("mysql_Xh7Z62");
+        dataSource.setUrl(jsonObject.get("url").toString());
+        dataSource.setUsername(jsonObject.get("username").toString());
+        dataSource.setPassword(jsonObject.get("password").toString());
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         clientMap.put(DEFAULT_KEY, jdbcTemplate);
     }

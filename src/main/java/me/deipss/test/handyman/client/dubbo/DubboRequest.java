@@ -21,8 +21,6 @@ public class DubboRequest extends ClientRequest {
     private String method;
 
 
-    private String url;
-
     private Map<String,String> rpcContext;
 
     private String[] paramNameList;
